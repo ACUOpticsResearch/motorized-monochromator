@@ -1,4 +1,4 @@
-/*Written by Eric Tate 2014. Edited by Darby Hewitt, Candace Brooks and 
+/*Written by Aric Tate 2014. Edited by Darby Hewitt, Candace Brooks and 
 Ryan Wilson 2015. 
 */
 
