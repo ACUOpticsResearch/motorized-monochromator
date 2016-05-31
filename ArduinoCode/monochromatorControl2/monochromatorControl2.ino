@@ -48,7 +48,7 @@ void EEPROMWritelong(int address, long value)
   EEPROM.write(address + 3, one);
 }
 
-void setWavelengthFromMemory() {
+void setWavelengthToMemory() {
  // Serial.println();
  // Serial.println("Set current wavelength in memory (EEPROM)");
 //  Serial.println("What address would you like to save to: 0,4,8...");
@@ -82,7 +82,7 @@ void getWavelengthFromMemory(){
   goldengoose = currenteep;
   current = currenteep;  
 }
-void goToWavelength(){
+long goToWavelength(){
   //Serial.println();
   //Serial.println("What wavelength would you like to go to (in Angstroms)?");
   //Serial.println("DO NOT GO OVER 9950 OR BELOW 2500.");
@@ -118,14 +118,20 @@ void goToWavelength(){
   }
   current = WVL2;                
   goldengoose = WVL2;
+  Serial.print(goldengoose);
+  return goldengoose;
 }   
-void stepUp(){
+long stepUp(){
   myMotor->step(1, FORWARD, SINGLE);
-  goldengoose = goldengoose + .3125;      
+  goldengoose = goldengoose + .3125;
+  Serial.print(goldengoose);
+  return goldengoose;  
 }
-void stepDown(){
+long stepDown(){
   myMotor->step(1, BACKWARD, SINGLE);
-  goldengoose = goldengoose - .3125;      
+  goldengoose = goldengoose - .3125;
+  Serial.print(goldengoose);
+  return goldengoose;  
 }
 void getLocalWavelength(){
   //Serial.println();
@@ -168,7 +174,7 @@ void loop() {
 
 ////////////////////////////////////////////////////////////////////
   if(leprechaun == 1){
-    setWavelengthFromMemory();
+    setWavelengthToMemory();
   }
   ///////////////////////////////////////////////////////////////////
   if(leprechaun == 2){
