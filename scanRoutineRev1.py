@@ -7,6 +7,7 @@
 # implement real-time plotting
 # put everything in a try:/except: so data taking can be exited gracefully (DONE?)
 # export csv file instead of posting data struct to screen (updated, needs testing)
+# Jared waz here
 
 import monochromator
 import multimeter
