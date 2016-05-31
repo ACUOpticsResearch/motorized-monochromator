@@ -1,55 +1,85 @@
 # Written by Candace Brooks 2015.
 #edited by Darby Hewitt 8/20/2015
-# TODO: remove sleep commands, and wait instead on arduino to return 
-#          a "done" message of some sort; this will require arduino 
-#          tweaks. One simple way is to use "\n" as the end char for 
-#          the "done" message over serial, and use readline() to wait  
+# TODO: remove sleep commands, and wait instead on arduino to return
+#          a "done" message of some sort; this will require arduino
+#          tweaks. One simple way is to use "\n" as the end char for
+#          the "done" message over serial, and use readline() to wait
 #          for the returned val
 #
 #       then, this class could use an overhaul to reflect the changes in the firmware
 #
 # changed shutDown to __del__(), because it does everything a destructor should
+# edited by Darby Hewitt 5/31/2016
+# * adding return values to all methods in order to minimize timing errors
+# * also replacing fixed delays between serial writes to serial reads
+
 import serial
 import time
-# This section of code connects to the correct port
-
-#This section of the code is to communicate with the arudino
-
 
 class Mono(object):
-    def __init__(self, Port):
-        self.serPort = serial.Serial(Port)
+    def __init__(self, port):
+        self.serPort = serial.Serial(port)
         #time.sleep(1.67)
-        #numberOfCharacters = self.serPort.inWaiting()
-        #below is a better way to wait than just sleeping; 
-        #  also it clears the buffer. assignment to initialReadout 
+        #numberOfCharacters = self.serPort.in_waiting
+        #below is a better way to wait than just sleeping;
+        #  also it clears the buffer. assignment to initialReadout
         #  automatically waits for readline to return something
         initialReadout = self.serPort.readline()
         initialReadout = self.serPort.readline()
         initialReadout = self.serPort.readline()
-        
+
         print "Monochromator wavelength is"
         self.getWavelengthFromMemory()
-        
+
     def setWavelengthInMemory(self, inputWavelength):
         self.inputWavelength = inputWavelength
         address = 0
+
         self.serPort.write('1')
-        time.sleep(1.67)
+        #time.sleep(1.67)
+        while(self.serPort.in_waiting == 0):
+            # this should do nothing until something is in the input buffer
+            pass
+        #flush input buffer
+        self.serPort.reset_input_buffer()
+
+'''
         self.serPort.write(str(address))
-        time.sleep(1.67)
+        while(self.serPort.in_waiting == 0):
+            # this should do nothing until something is in the input buffer
+            pass
+        #flush input buffer
+        self.serPort.reset_input_buffer()
+'''
+
         self.serPort.write(str(inputWavelength))
-        time.sleep(1.67)
-        print self.serPort.read(self.serPort.inWaiting())
-  
+
+        while(self.serPort.in_waiting == 0):
+            # this should do nothing until something is in the input buffer
+            pass
+
+        #output contents of input buffer
+        wvl = self.serPort.read(self.serPort.in_waiting)
+
+        #reset input buffer after read
+        self.serPort.reset_input_buffer()
+        #print wvl
+        return wvl
+
+
     def getWavelengthFromMemory(self):
         self.serPort.write('2')
 #        time.sleep(1.67)
-#        storedWavelength = self.serPort.read(self.serPort.inWaiting())
+#        storedWavelength = self.serPort.read(self.serPort.in_waiting)
+
+        #wait for available bytes
+        while(self.serPort.in_waiting == 0)
+            pass
         storedWavelength = self.serPort.read(4)
+
         self.storedWavelength = storedWavelength
         print storedWavelength
-    
+
     def goToWavelength(self, chooseWavelengthInAngstroms):
         self.chooseWavelengthInAngstroms = chooseWavelengthInAngstroms
         if chooseWavelengthInAngstroms > 9950 or chooseWavelengthInAngstroms < 2500:
@@ -59,7 +89,7 @@ class Mono(object):
             time.sleep(1.67)
             self.serPort.write(str(chooseWavelengthInAngstroms))
             time.sleep(1.67)
-            out = self.serPort.read(self.serPort.inWaiting())
+            out = self.serPort.read(self.serPort.in_waiting)
             #print out
 
     def stepUp(self):
@@ -73,7 +103,7 @@ class Mono(object):
     def getWavelength(self):
         self.serPort.write('6')
         time.sleep(1.67)
-        currentWavelength = self.serPort.read(self.serPort.inWaiting())
+        currentWavelength = self.serPort.read(self.serPort.in_waiting)
         self.currentWavelength = currentWavelength
         print currentWavelength
 
@@ -83,8 +113,8 @@ class Mono(object):
     def openPort(self, Port):
         self.serPort = serial.Serial(Port)
         time.sleep(1.67)
-        print self.serPort.inWaiting()
-        print self.serPort.read(self.serPort.inWaiting())
+        print self.serPort.in_waiting
+        print self.serPort.read(self.serPort.in_waiting)
 
     def manualIncrementUp(self, low, high, inc):
         low = low
@@ -118,7 +148,7 @@ class Mono(object):
     def __del__(self):
         print "Final monochromator wavelength is"
         self.getWavelength()
-        print "Saved value is"  
+        print "Saved value is"
         self.getWavelengthFromMemory()
         finalWavelength = int(self.currentWavelength)
         if int(self.storedWavelength) != finalWavelength:
@@ -128,9 +158,8 @@ class Mono(object):
 
     def shutDown(self):
         self.__del__()
-    
+
 
 if __name__ == "__main__":
     b = Mono('COM3')
     #b.setWavelengthInMemory(6990)
-    
