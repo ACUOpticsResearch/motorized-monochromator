@@ -12,27 +12,27 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // to motor port #2 (M3 and M4)
 Adafruit_StepperMotor *myMotor = AFMS.getStepper(200, 2);
 
-long address;
+#define ADDR 0
 long currenteep; 
 long current; 
 long currenteep2;
-long WVL,WVL2;
+long wvl;
 long dif;
 long goldengoose;
 
-long EEPROMReadlong(long address)
+long EEPROMReadlong()
 {
   //Read the 4 bytes from the eeprom memory.
-  long four = EEPROM.read(address);
-  long three = EEPROM.read(address + 1);
-  long two = EEPROM.read(address + 2);
-  long one = EEPROM.read(address + 3);
+  long four = EEPROM.read(ADDR);
+  long three = EEPROM.read(ADDR + 1);
+  long two = EEPROM.read(ADDR + 2);
+  long one = EEPROM.read(ADDR + 3);
 
   //Return the recomposed long by using bitshift.
   return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
 
-void EEPROMWritelong(int address, long value)
+void EEPROMWritelong(long value)
 {
   //Decomposition from a long to 4 bytes by using bitshift.
   //One = Most significant -> Four = Least significant byte
@@ -42,22 +42,22 @@ void EEPROMWritelong(int address, long value)
   byte one = ((value >> 24) & 0xFF);
 
   //Write the 4 bytes into the eeprom memory.
-  EEPROM.write(address, four);
-  EEPROM.write(address + 1, three);
-  EEPROM.write(address + 2, two);
-  EEPROM.write(address + 3, one);
+  EEPROM.write(ADDR, four);
+  EEPROM.write(ADDR + 1, three);
+  EEPROM.write(ADDR + 2, two);
+  EEPROM.write(ADDR + 3, one);
 }
 
 void setWavelengthToMemory() {
  // Serial.println();
  // Serial.println("Set current wavelength in memory (EEPROM)");
 //  Serial.println("What address would you like to save to: 0,4,8...");
-  Serial.flush();
-  while (!Serial.available());
-  delay(300);
-  if(Serial.available()){
-    address = Serial.parseInt();
-  }
+//  Serial.flush();
+//  while (!Serial.available());
+//  delay(300);
+//  if(Serial.available()){
+//    address = Serial.parseInt();
+//  }
  // Serial.println();
  // Serial.println("What is the current wavelength in Angstroms");
   Serial.flush();
@@ -68,10 +68,11 @@ void setWavelengthToMemory() {
   }
   goldengoose = currenteep2;
   current = currenteep2;
-  EEPROMWritelong(address ,currenteep2); // change 0 back to "address"
+  EEPROMWritelong(currenteep2); // change 0 back to "address"
+
 }   
 void getWavelengthFromMemory(){
-  currenteep = EEPROMReadlong(0);   // change 0....  read "current" wavelength from eeprom
+  currenteep = EEPROMReadlong();   // change 0....  read "current" wavelength from eeprom
 
  // Serial.println();
  // Serial.print("The current wavelength saved to EEPROM is ");
@@ -86,38 +87,38 @@ long goToWavelength(){
   //Serial.println();
   //Serial.println("What wavelength would you like to go to (in Angstroms)?");
   //Serial.println("DO NOT GO OVER 9950 OR BELOW 2500.");
-  Serial.flush();
+  //Serial.flush();
   while (!Serial.available());
   delay(300);
   if(Serial.available()){
-    WVL2 = Serial.parseInt();
+    wvl = Serial.parseInt();
   }
   //Serial.print("You have entered ");
-  //Serial.print(WVL2);
- // Serial.println(" Angstroms.");
+  //Serial.print(wvl);
+  //Serial.println(" Angstroms.");
 
-  if(WVL2 > 9990 || WVL2 < 2500)
+  if(wvl > 9990 || wvl < 2500)
   {
-   // Serial.println("You have entered an invalid wavelength.");
+    //Serial.println("You have entered an invalid wavelength.");
     Serial.flush();
-    WVL2 = current;
+    wvl = current;
   }
 
-  dif = WVL2 - current;
+  dif = wvl - current;
   if(dif<0){
     dif = dif*(-1);
   }
   // int steps = dif/1.25; // 1/1 ratio
      int steps = dif/.3125; // 1/4   
  
-  if( WVL2 > current ){
+  if( wvl > current ){
     myMotor->step(steps, FORWARD, SINGLE);
   }
-  if( WVL2 < current ){
+  if( wvl < current ){
     myMotor->step(steps, BACKWARD, SINGLE);
   }
-  current = WVL2;                
-  goldengoose = WVL2;
+  current = wvl;                
+  goldengoose = wvl;
   Serial.print(goldengoose);
   return goldengoose;
 }   
