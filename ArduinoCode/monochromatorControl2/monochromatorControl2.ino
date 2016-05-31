@@ -151,7 +151,7 @@ void setup() {
 }
 
 void loop() {
-  int leprechaun = 0;
+  int action = 0;
 
 /*
   Serial.println("");
@@ -167,34 +167,34 @@ void loop() {
   while (!Serial.available());
   //delay(300);
   if(Serial.available()){
-    leprechaun = Serial.parseInt();
+    action = Serial.parseInt();
   }
   
 
 
 
 ////////////////////////////////////////////////////////////////////
-  if(leprechaun == 1){
+  if(action == 1){
     setWavelengthToMemory();
   }
   ///////////////////////////////////////////////////////////////////
-  if(leprechaun == 2){
+  if(action == 2){
     getWavelengthFromMemory();
   }
   /////////////////////////////////////////////////////////////////////////////
-  if(leprechaun == 3){
+  if(action == 3){
     goToWavelength();
   }
   ////////////////////////////////////////////////////////////////////
-  if(leprechaun == 4){
+  if(action == 4){
     stepUp();
   }
   //////////////////////////////////////////////////////////////////
-  if(leprechaun == 5){
+  if(action == 5){
     stepDown();
   }
   //////////////////////////////////////////////////////////////////
-  if(leprechaun == 6){
+  if(action == 6){
     getLocalWavelength();
   }
   //////////////////////////////////////////////////////////////////
