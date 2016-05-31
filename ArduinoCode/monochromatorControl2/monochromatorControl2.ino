@@ -15,7 +15,6 @@ Adafruit_StepperMotor *myMotor = AFMS.getStepper(200, 2);
 #define ADDR 0
 float currenteep; 
 float current; 
-float currenteep2;
 float wvl;
 float dif;
 float goldengoose;
@@ -64,11 +63,11 @@ void setWavelengthToMemory() {
   while (!Serial.available());
   delay(300);
   if(Serial.available()){
-    currenteep2 = Serial.parseInt();
+    currenteep = Serial.parseInt();
   }
-  goldengoose = currenteep2;
-  current = currenteep2;
-  EEPROMWriteFloat(currenteep2); // change 0 back to "address"
+  goldengoose = currenteep;
+  current = currenteep;
+  EEPROMWriteFloat(currenteep); // change 0 back to "address"
 
 }   
 void getWavelengthFromMemory(){
