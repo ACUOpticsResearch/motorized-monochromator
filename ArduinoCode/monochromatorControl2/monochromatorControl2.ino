@@ -55,7 +55,7 @@ void setWavelengthToMemory() {
 //  while (!Serial.available());
 //  delay(300);
 //  if(Serial.available()){
-//    address = Serial.parseInt();
+//    address = Serial.parseFloat();
 //  }
  // Serial.println();
  // Serial.println("What is the current wavelength in Angstroms");
@@ -63,7 +63,7 @@ void setWavelengthToMemory() {
   while (!Serial.available());
   delay(300);
   if(Serial.available()){
-    currenteep = Serial.parseInt();
+    currenteep = Serial.parseFloat();
   }
   goldengoose = currenteep;
   current = currenteep;
@@ -90,7 +90,7 @@ float goToWavelength(){
   while (!Serial.available());
   delay(300);
   if(Serial.available()){
-    wvl = Serial.parseInt();
+    wvl = Serial.parseFloat();
   }
   //Serial.print("You have entered ");
   //Serial.print(wvl);
@@ -166,7 +166,7 @@ void loop() {
   while (!Serial.available());
   //delay(300);
   if(Serial.available()){
-    action = Serial.parseInt();
+    action = Serial.parseFloat();
   }
   
 
