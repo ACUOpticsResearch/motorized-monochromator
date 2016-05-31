@@ -13,14 +13,14 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *myMotor = AFMS.getStepper(200, 2);
 
 #define ADDR 0
-long currenteep; 
-long current; 
-long currenteep2;
-long wvl;
-long dif;
-long goldengoose;
+float currenteep; 
+float current; 
+float currenteep2;
+float wvl;
+float dif;
+float goldengoose;
 
-long EEPROMReadlong()
+float EEPROMReadlong()
 {
   //Read the 4 bytes from the eeprom memory.
   long four = EEPROM.read(ADDR);
@@ -32,14 +32,14 @@ long EEPROMReadlong()
   return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
 
-void EEPROMWritelong(long value)
+void EEPROMWritelong(float value)
 {
   //Decomposition from a long to 4 bytes by using bitshift.
   //One = Most significant -> Four = Least significant byte
-  byte four = (value & 0xFF);
-  byte three = ((value >> 8) & 0xFF);
-  byte two = ((value >> 16) & 0xFF);
-  byte one = ((value >> 24) & 0xFF);
+  byte four = ((long)value & 0xFF);
+  byte three = (((long)value >> 8) & 0xFF);
+  byte two = (((long)value >> 16) & 0xFF);
+  byte one = (((long)value >> 24) & 0xFF);
 
   //Write the 4 bytes into the eeprom memory.
   EEPROM.write(ADDR, four);
@@ -83,7 +83,7 @@ void getWavelengthFromMemory(){
   goldengoose = currenteep;
   current = currenteep;  
 }
-long goToWavelength(){
+float goToWavelength(){
   //Serial.println();
   //Serial.println("What wavelength would you like to go to (in Angstroms)?");
   //Serial.println("DO NOT GO OVER 9950 OR BELOW 2500.");
@@ -122,13 +122,13 @@ long goToWavelength(){
   Serial.print(goldengoose);
   return goldengoose;
 }   
-long stepUp(){
+float stepUp(){
   myMotor->step(1, FORWARD, SINGLE);
   goldengoose = goldengoose + .3125;
   Serial.print(goldengoose);
   return goldengoose;  
 }
-long stepDown(){
+float stepDown(){
   myMotor->step(1, BACKWARD, SINGLE);
   goldengoose = goldengoose - .3125;
   Serial.print(goldengoose);
