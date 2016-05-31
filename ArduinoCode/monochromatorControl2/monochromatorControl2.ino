@@ -48,7 +48,7 @@ void EEPROMWritelong(int address, long value)
   EEPROM.write(address + 3, one);
 }
 
-void AX() {
+void setWavelengthFromMemory() {
  // Serial.println();
  // Serial.println("Set current wavelength in memory (EEPROM)");
 //  Serial.println("What address would you like to save to: 0,4,8...");
@@ -70,7 +70,7 @@ void AX() {
   current = currenteep2;
   EEPROMWritelong(address ,currenteep2); // change 0 back to "address"
 }   
-void BX(){
+void getWavelengthFromMemory(){
   currenteep = EEPROMReadlong(0);   // change 0....  read "current" wavelength from eeprom
 
  // Serial.println();
@@ -82,7 +82,7 @@ void BX(){
   goldengoose = currenteep;
   current = currenteep;  
 }
-void CX(){
+void goToWavelength(){
   //Serial.println();
   //Serial.println("What wavelength would you like to go to (in Angstroms)?");
   //Serial.println("DO NOT GO OVER 9950 OR BELOW 2500.");
@@ -119,15 +119,15 @@ void CX(){
   current = WVL2;                
   goldengoose = WVL2;
 }   
-void DX(){
+void stepUp(){
   myMotor->step(1, FORWARD, SINGLE);
   goldengoose = goldengoose + .3125;      
 }
-void EX(){
+void stepDown(){
   myMotor->step(1, BACKWARD, SINGLE);
   goldengoose = goldengoose - .3125;      
 }
-void FX(){
+void getLocalWavelength(){
   //Serial.println();
   //Serial.print("The current wavelength is ");
   Serial.print(goldengoose);
@@ -168,27 +168,27 @@ void loop() {
 
 ////////////////////////////////////////////////////////////////////
   if(leprechaun == 1){
-    AX();
+    setWavelengthFromMemory();
   }
   ///////////////////////////////////////////////////////////////////
   if(leprechaun == 2){
-    BX();
+    getWavelengthFromMemory();
   }
   /////////////////////////////////////////////////////////////////////////////
   if(leprechaun == 3){
-    CX();
+    goToWavelength();
   }
   ////////////////////////////////////////////////////////////////////
   if(leprechaun == 4){
-    DX();
+    stepUp();
   }
   //////////////////////////////////////////////////////////////////
   if(leprechaun == 5){
-    EX();
+    stepDown();
   }
   //////////////////////////////////////////////////////////////////
   if(leprechaun == 6){
-    FX();
+    getLocalWavelength();
   }
   //////////////////////////////////////////////////////////////////
 
