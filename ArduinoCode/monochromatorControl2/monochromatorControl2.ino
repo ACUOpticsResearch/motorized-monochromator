@@ -20,7 +20,7 @@ float wvl;
 float dif;
 float goldengoose;
 
-float EEPROMReadlong()
+float EEPROMReadFloat()
 {
   //Read the 4 bytes from the eeprom memory.
   long four = EEPROM.read(ADDR);
@@ -29,10 +29,10 @@ float EEPROMReadlong()
   long one = EEPROM.read(ADDR + 3);
 
   //Return the recomposed long by using bitshift.
-  return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
+  return (float) ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
 
-void EEPROMWritelong(float value)
+void EEPROMWriteFloat(float value)
 {
   //Decomposition from a long to 4 bytes by using bitshift.
   //One = Most significant -> Four = Least significant byte
@@ -68,11 +68,11 @@ void setWavelengthToMemory() {
   }
   goldengoose = currenteep2;
   current = currenteep2;
-  EEPROMWritelong(currenteep2); // change 0 back to "address"
+  EEPROMWriteFloat(currenteep2); // change 0 back to "address"
 
 }   
 void getWavelengthFromMemory(){
-  currenteep = EEPROMReadlong();   // change 0....  read "current" wavelength from eeprom
+  currenteep = EEPROMReadFloat();   // change 0....  read "current" wavelength from eeprom
 
  // Serial.println();
  // Serial.print("The current wavelength saved to EEPROM is ");
