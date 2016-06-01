@@ -103,28 +103,19 @@ float goToWavelength(float wave){
     myMotor->release();
   }
   currentLocal = wave;
-  Serial.print(currentLocal);
   return currentLocal;
 }   
 float stepUp(){
   myMotor->step(1, FORWARD, SINGLE);
   currentLocal = currentLocal + .3125;
-  Serial.print(currentLocal);
   myMotor->release();
   return currentLocal;  
 }
 float stepDown(){
   myMotor->step(1, BACKWARD, SINGLE);
   currentLocal = currentLocal - .3125;
-  Serial.print(currentLocal);
   myMotor->release();
   return currentLocal;
-}
-void getLocalWavelength(){
-  //Serial.println();
-  //Serial.print("The current wavelength is ");
-  Serial.print(currentLocal);
-  //Serial.println(" Angstroms.");
 }
 
 void setup() {
@@ -175,19 +166,19 @@ void loop() {
   if(action == 3){
     while (!Serial.available());
     delay(300);
-    goToWavelength(Serial.parseFloat());
+    Serial.print(goToWavelength(Serial.parseFloat()));
   }
   ////////////////////////////////////////////////////////////////////
   if(action == 4){
-    stepUp();
+    Serial.print(stepUp());
   }
   //////////////////////////////////////////////////////////////////
   if(action == 5){
-    stepDown();
+    Serial.print(stepDown());
   }
   //////////////////////////////////////////////////////////////////
   if(action == 6){
-    getLocalWavelength();
+    Serial.print(currentLocal);
   }
   //////////////////////////////////////////////////////////////////
 
