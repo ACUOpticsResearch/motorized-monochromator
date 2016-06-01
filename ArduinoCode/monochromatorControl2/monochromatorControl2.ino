@@ -96,9 +96,11 @@ float goToWavelength(float wave){
  
   if( wave > currentLocal ){
     myMotor->step(steps, FORWARD, SINGLE);
+    myMotor->release();
   }
   if( wave < currentLocal ){
     myMotor->step(steps, BACKWARD, SINGLE);
+    myMotor->release();
   }
   currentLocal = wave;
   Serial.print(currentLocal);
@@ -108,13 +110,15 @@ float stepUp(){
   myMotor->step(1, FORWARD, SINGLE);
   currentLocal = currentLocal + .3125;
   Serial.print(currentLocal);
+  myMotor->release();
   return currentLocal;  
 }
 float stepDown(){
   myMotor->step(1, BACKWARD, SINGLE);
   currentLocal = currentLocal - .3125;
   Serial.print(currentLocal);
-  return currentLocal;  
+  myMotor->release();
+  return currentLocal;
 }
 void getLocalWavelength(){
   //Serial.println();
