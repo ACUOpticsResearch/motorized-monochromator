@@ -47,7 +47,7 @@ void EEPROMWriteFloat(float value)
   EEPROM.write(ADDR + 3, one);
 }
 
-void setWavelengthToMemory() {
+void setWavelengthToMemory(float wave) {
  // Serial.println();
  // Serial.println("Set current wavelength in memory (EEPROM)");
 //  Serial.println("What address would you like to save to: 0,4,8...");
@@ -59,15 +59,10 @@ void setWavelengthToMemory() {
 //  }
  // Serial.println();
  // Serial.println("What is the current wavelength in Angstroms");
-  Serial.flush();
-  while (!Serial.available());
-  delay(300);
-  if(Serial.available()){
-    currenteep = Serial.parseFloat();
-  }
-  goldengoose = currenteep;
-  current = currenteep;
-  EEPROMWriteFloat(currenteep); // change 0 back to "address"
+  
+  goldengoose = wave;
+  current = wave;
+  EEPROMWriteFloat(wave); // change 0 back to "address"
 
 }   
 void getWavelengthFromMemory(){
@@ -82,42 +77,38 @@ void getWavelengthFromMemory(){
   goldengoose = currenteep;
   current = currenteep;  
 }
-float goToWavelength(){
+float goToWavelength(float wave){
   //Serial.println();
   //Serial.println("What wavelength would you like to go to (in Angstroms)?");
   //Serial.println("DO NOT GO OVER 9950 OR BELOW 2500.");
   //Serial.flush();
-  while (!Serial.available());
-  delay(300);
-  if(Serial.available()){
-    wvl = Serial.parseFloat();
-  }
+  
   //Serial.print("You have entered ");
   //Serial.print(wvl);
   //Serial.println(" Angstroms.");
 
-  if(wvl > 9990 || wvl < 2500)
+  if(wave > 9990 || wave < 2500)
   {
     //Serial.println("You have entered an invalid wavelength.");
     Serial.flush();
-    wvl = current;
+    wave = current;
   }
 
-  dif = wvl - current;
+  dif = wave - current;
   if(dif<0){
     dif = dif*(-1);
   }
   // int steps = dif/1.25; // 1/1 ratio
      int steps = dif/.3125; // 1/4   
  
-  if( wvl > current ){
+  if( wave > current ){
     myMotor->step(steps, FORWARD, SINGLE);
   }
-  if( wvl < current ){
+  if( wave < current ){
     myMotor->step(steps, BACKWARD, SINGLE);
   }
-  current = wvl;                
-  goldengoose = wvl;
+  current = wave;                
+  goldengoose = wave;
   Serial.print(goldengoose);
   return goldengoose;
 }   
@@ -151,6 +142,7 @@ void setup() {
 
 void loop() {
   int action = 0;
+  float parsedWvl;
 
 /*
   Serial.println("");
@@ -174,7 +166,13 @@ void loop() {
 
 ////////////////////////////////////////////////////////////////////
   if(action == 1){
-    setWavelengthToMemory();
+    Serial.flush();
+    while (!Serial.available());
+    delay(300);
+    if(Serial.available()){
+      parsedWvl = Serial.parseFloat();
+    }
+    setWavelengthToMemory(parsedWvl);
   }
   ///////////////////////////////////////////////////////////////////
   if(action == 2){
@@ -182,7 +180,12 @@ void loop() {
   }
   /////////////////////////////////////////////////////////////////////////////
   if(action == 3){
-    goToWavelength();
+    while (!Serial.available());
+    delay(300);
+    if(Serial.available()){
+      parsedWvl = Serial.parseFloat();
+    }
+    goToWavelength(parsedWvl);
   }
   ////////////////////////////////////////////////////////////////////
   if(action == 4){
