@@ -145,7 +145,7 @@ void loop() {
   while (!Serial.available());
   //delay(300);
   if(Serial.available()){
-    action = Serial.parseFloat();
+    action = Serial.parseInt();
   }
   
 
