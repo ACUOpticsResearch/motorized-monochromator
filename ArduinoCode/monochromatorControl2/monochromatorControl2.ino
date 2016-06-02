@@ -44,7 +44,7 @@ void EEPROMWriteFloat(float value)
   EEPROM.write(ADDR + 3, one);
 }
 
-void setWavelengthToMemory(float wave) {
+float setWavelengthToMemory(float wave) {
  // Serial.println();
  // Serial.println("Set current wavelength in memory (EEPROM)");
 //  Serial.println("What address would you like to save to: 0,4,8...");
@@ -60,15 +60,12 @@ void setWavelengthToMemory(float wave) {
   currentLocal = wave;
   currentMemory = wave;
   EEPROMWriteFloat(wave); // change 0 back to "address"
+  return wave;
 }   
-void getWavelengthFromMemory(){
+float getWavelengthFromMemory(){
   currentMemory = EEPROMReadFloat();   // change 0....  read "current" wavelength from eeprom
   currentLocal = currentMemory;
- // Serial.println();
- // Serial.print("The current wavelength saved to EEPROM is ");
-  Serial.print(currentMemory);
- // Serial.println(" Angstroms");
-  Serial.flush();
+  return currentMemory;
 }
 float goToWavelength(float wave){
   //Serial.println();
@@ -156,11 +153,12 @@ void loop() {
     Serial.flush();
     while (!Serial.available());
     delay(300);
-    setWavelengthToMemory(Serial.parseFloat());
+    Serial.print(setWavelengthToMemory(Serial.parseFloat()));
   }
   ///////////////////////////////////////////////////////////////////
   if(action == 2){
-    getWavelengthFromMemory();
+    Serial.print(getWavelengthFromMemory());
+    Serial.flush();
   }
   /////////////////////////////////////////////////////////////////////////////
   if(action == 3){
