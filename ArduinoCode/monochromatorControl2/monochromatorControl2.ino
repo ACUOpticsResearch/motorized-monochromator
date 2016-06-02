@@ -117,7 +117,7 @@ float stepDown(){
 }
 
 void setup() {
-  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.begin(115200);           // set up Serial library at 9600 bps
  // Serial.println("L A S E Rz");
 
   AFMS.begin();  // create with the default frequency 1.6KHz
@@ -151,37 +151,39 @@ void loop() {
 
 ////////////////////////////////////////////////////////////////////
   if(action == 1){
+    Serial.println("Ok");
     Serial.flush();
     while (!Serial.available());
-    delay(300);
-    Serial.print(setWavelengthToMemory(Serial.parseFloat()));
+    delay(30);
+    Serial.println(setWavelengthToMemory(Serial.parseFloat()));
   }
   ///////////////////////////////////////////////////////////////////
   if(action == 2){
-    Serial.print(getWavelengthFromMemory());
+    Serial.println(getWavelengthFromMemory());
     Serial.flush();
   }
   /////////////////////////////////////////////////////////////////////////////
   if(action == 3){
+    Serial.println("Ok");
     while (!Serial.available());
-    delay(300);
-    Serial.print(goToWavelength(Serial.parseFloat()));
+    delay(30);
+    Serial.println(goToWavelength(Serial.parseFloat()));
   }
   ////////////////////////////////////////////////////////////////////
   if(action == 4){
-    Serial.print(stepUp());
+    Serial.println(stepUp());
   }
   //////////////////////////////////////////////////////////////////
   if(action == 5){
-    Serial.print(stepDown());
+    Serial.println(stepDown());
   }
   //////////////////////////////////////////////////////////////////
   if(action == 6){
-    Serial.print(currentLocal);
+    Serial.println(currentLocal);
   }
   //////////////////////////////////////////////////////////////////
 
-  delay(300);
+  delay(30);
 }
 
 //the end
