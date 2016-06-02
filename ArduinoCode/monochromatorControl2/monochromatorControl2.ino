@@ -1,5 +1,15 @@
 /*Written by Aric Tate 2014. Edited by Darby Hewitt, Candace Brooks and 
 Ryan Wilson 2015. 
+Modified by Jared Barker 2016
+
+What would you like to do?
+
+1: Set current wavelength in memory
+2: Get current wavelength from memory
+3: Go to a wavelenth on the MC
+4: Make a single step up   (+.3125 Angstroms)
+5: Make a single step down (-.3125 Angstroms)
+6: Get current wavelength
 */
 
 
@@ -47,51 +57,36 @@ float EEPROMWriteFloat(float value)
 }
 
 float setWavelengthToMemory(float wave) {
- // Serial.println();
- // Serial.println("Set current wavelength in memory (EEPROM)");
-//  Serial.println("What address would you like to save to: 0,4,8...");
-//  Serial.flush();
-//  while (!Serial.available());
-//  delay(300);
-//  if(Serial.available()){
-//    address = Serial.parseFloat();
-//  }
- // Serial.println();
- // Serial.println("What is the current wavelength in Angstroms");
-  
+  //Updates the two global variables, writes it into EEPROM, and returns the given wavelength
   currentLocal = wave;
   currentMemory = wave;
   return EEPROMWriteFloat(wave); // change 0 back to "address"
 }   
+
 float getWavelengthFromMemory(){
+  //Reads from the EEPROM, updates the global variables, and then returns the wavelength that was read
   currentMemory = EEPROMReadFloat();   // change 0....  read "current" wavelength from eeprom
   currentLocal = currentMemory;
   return currentMemory;
 }
-float goToWavelength(float wave){
-  //Serial.println();
-  //Serial.println("What wavelength would you like to go to (in Angstroms)?");
-  //Serial.println("DO NOT GO OVER 9950 OR BELOW 2500.");
-  //Serial.flush();
-  
-  //Serial.print("You have entered ");
-  //Serial.print(wave);
-  //Serial.println(" Angstroms.");
 
+float goToWavelength(float wave){
+  //Checks if the wavelength is within the possible range
   if(wave > 9990 || wave < 2500)
   {
-    //Serial.println("You have entered an invalid wavelength.");
+    //Invalid wavelength. Causes it to do nothing
     Serial.flush();
     wave = currentLocal;
   }
 
+  //Calculates the number of steps the motor will need to turn in order to get to the desired wavelength
   int dif = wave - currentLocal;
   if(dif<0){
     dif = dif*(-1);
   }
-  // int steps = dif/1.25; // 1/1 ratio
-     int steps = dif/.3125; // 1/4   
+  int steps = dif/.3125; // 1/4   
  
+  //Turns the motor in the needed direction for the calculated number of steps
   if( wave > currentLocal ){
     myMotor->step(steps, FORWARD, SINGLE);
     myMotor->release();
@@ -100,16 +95,22 @@ float goToWavelength(float wave){
     myMotor->step(steps, BACKWARD, SINGLE);
     myMotor->release();
   }
+  
+  //Keeps the variable up to date and then returns it
   currentLocal = wave;
   return currentLocal;
 }   
+
 float stepUp(){
+  //Moves motor one step up and returns the new wavelength
   myMotor->step(1, FORWARD, SINGLE);
   currentLocal = currentLocal + .3125;
   myMotor->release();
   return currentLocal;  
 }
+
 float stepDown(){
+  //Moves motor one step down and returns the new wavelength
   myMotor->step(1, BACKWARD, SINGLE);
   currentLocal = currentLocal - .3125;
   myMotor->release();
@@ -117,74 +118,63 @@ float stepDown(){
 }
 
 void setup() {
-  Serial.begin(115200);           // set up Serial library at 9600 bps
- // Serial.println("L A S E Rz");
-
-  AFMS.begin();  // create with the default frequency 1.6KHz
-  //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  /*
+  Sets up the necessary objects. Default frequency is 1.6 kHz. If another frequency is desired,
+  it can be specified by using AFMS.begin(1000) for 1 kHz, for example. Also synchronizes the 
+  the currentLocal and current Memory variables by calling getWavelengthFromMemory()
+  */
+  
+  Serial.begin(115200);
+  AFMS.begin();
   myMotor->setSpeed(50);
   getWavelengthFromMemory();  
 }
 
 void loop() {
+  //Continually asks the user for a prompt, and then runs the command
   int action = 0;
 
-/*
-  Serial.println("");
-  Serial.println("Would you like to");
-  Serial.println("1: Set current wavelength in memory");
-  Serial.println("2: Get current wavelength from memory");
-  Serial.println("3: Go to a wavelenth on the MC");
-  Serial.println("4: Make a single step up   (+.3125 Angstroms)");
-  Serial.println("5: Make a single step down (-.3125 Angstroms)");
-  Serial.println("6: Get current wavelength");
-  Serial.flush();
-*/
   while (!Serial.available());
-  //delay(300);
   if(Serial.available()){
     action = Serial.parseInt();
   }
   
-
-
-
-////////////////////////////////////////////////////////////////////
+  //Sets Wavelength in EEPROM
   if(action == 1){
     Serial.println("Ok");
     Serial.flush();
     while (!Serial.available());
-    delay(30);
     Serial.println(setWavelengthToMemory(Serial.parseFloat()));
   }
-  ///////////////////////////////////////////////////////////////////
+  
+  //Prints the Wavelength Saved in EEPROM
   if(action == 2){
     Serial.println(getWavelengthFromMemory());
     Serial.flush();
   }
-  /////////////////////////////////////////////////////////////////////////////
+  
+  //Moves the Monochromator to a Specific Wavelength
   if(action == 3){
     Serial.println("Ok");
     while (!Serial.available());
-    delay(30);
     Serial.println(goToWavelength(Serial.parseFloat()));
   }
-  ////////////////////////////////////////////////////////////////////
+  
+  //Steps Up the Wavelength
   if(action == 4){
     Serial.println(stepUp());
   }
-  //////////////////////////////////////////////////////////////////
+  
+  //Steps Down the Wavelength
   if(action == 5){
     Serial.println(stepDown());
   }
-  //////////////////////////////////////////////////////////////////
+  
+  //Prints the Local Wavelength
   if(action == 6){
     Serial.println(currentLocal);
   }
-  //////////////////////////////////////////////////////////////////
-
-  delay(30);
 }
 
-//the end
+//The End
 
