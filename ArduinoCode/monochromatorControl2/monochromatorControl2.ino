@@ -28,7 +28,7 @@ float EEPROMReadFloat()
   return (float) ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
 }
 
-void EEPROMWriteFloat(float value)
+float EEPROMWriteFloat(float value)
 {
   //Decomposition from a long to 4 bytes by using bitshift.
   //One = Most significant -> Four = Least significant byte
@@ -42,6 +42,8 @@ void EEPROMWriteFloat(float value)
   EEPROM.write(ADDR + 1, three);
   EEPROM.write(ADDR + 2, two);
   EEPROM.write(ADDR + 3, one);
+  
+  return value;
 }
 
 float setWavelengthToMemory(float wave) {
@@ -59,8 +61,7 @@ float setWavelengthToMemory(float wave) {
   
   currentLocal = wave;
   currentMemory = wave;
-  EEPROMWriteFloat(wave); // change 0 back to "address"
-  return wave;
+  return EEPROMWriteFloat(wave); // change 0 back to "address"
 }   
 float getWavelengthFromMemory(){
   currentMemory = EEPROMReadFloat();   // change 0....  read "current" wavelength from eeprom
