@@ -23,7 +23,7 @@ import time
 class Mono(object):
     def __init__(self, port):
         self.serPort = serial.Serial(port, baudrate=115200)
-        #time.sleep(1.67)
+        time.sleep(2)
         #numberOfCharacters = self.serPort.in_waiting
         #below is a better way to wait than just sleeping;
         #  also it clears the buffer. assignment to initialReadout
@@ -31,11 +31,10 @@ class Mono(object):
         #initialReadout = self.serPort.readline()
         #initialReadout = self.serPort.readline()
         #initialReadout = self.serPort.readline()
-        a.reset_input_buffer()
-        a.reset_output_buffer()
-
+        self.serPort.reset_input_buffer()
+        self.serPort.reset_output_buffer()
         #print "Monochromator wavelength is"
-        #self.getWavelengthFromMemory()
+        self.getWavelengthFromMemory()
 
     def __wrt__(self, input):
         self.serPort.write(input)
@@ -47,79 +46,76 @@ class Mono(object):
         return str(self.serPort.read(self.serPort.in_waiting)).strip()
 
     def setWavelengthInMemory(self, inputWavelength):
-        self.inputWavelength = inputWavelength
-        address = 0
-
-        self.__wrt__('1')
+        self.__wrt__(str(1))
         #time.sleep(1.67)
-        while(self.serPort.in_waiting == 0):
+        #while(self.serPort.in_waiting == 0):
             # this should do nothing until something is in the input buffer
-            pass
+        #    pass
         #flush input buffer
         self.serPort.reset_input_buffer()
 
-'''
-        self.serPort.write(str(address))
-        while(self.serPort.in_waiting == 0):
+        #self.serPort.write(str(address))
+        #while(self.serPort.in_waiting == 0):
             # this should do nothing until something is in the input buffer
-            pass
+        #    pass
         #flush input buffer
-        self.serPort.reset_input_buffer()
-'''
-        self.serPort.write(str(inputWavelength))
+        #self.serPort.reset_input_buffer()
 
-        while(self.serPort.in_waiting == 0):
+        self.__wrt__(str(inputWavelength))
+
+        #while(self.serPort.in_waiting == 0):
             # this should do nothing until something is in the input buffer
-            pass
+        #    pass
 
         #output contents of input buffer
-        wvl = self.serPort.read(self.serPort.in_waiting)
-
+        wvl = self.__rd__()
         #reset input buffer after read
         self.serPort.reset_input_buffer()
         #print wvl
         return wvl
 
-
     def getWavelengthFromMemory(self):
-        self.serPort.write('2')
+        self.__wrt__('2')
 #        time.sleep(1.67)
 #        storedWavelength = self.serPort.read(self.serPort.in_waiting)
 
         #wait for available bytes
-        while(self.serPort.in_waiting == 0)
-            pass
-        storedWavelength = self.serPort.read(4)
+        #while(self.serPort.in_waiting == 0)
+        #    pass
 
-        self.storedWavelength = storedWavelength
-        print storedWavelength
+        self.storedWavelength = self.__rd__()
+        return self.storedWavelength
 
     def goToWavelength(self, chooseWavelengthInAngstroms):
         self.chooseWavelengthInAngstroms = chooseWavelengthInAngstroms
         if chooseWavelengthInAngstroms > 9950 or chooseWavelengthInAngstroms < 2500:
-            print "Invaild monochromator wavelength"
+            raise ValueError('Invalid monochromator wavelength')
         else:
-            self.serPort.write('3')
-            time.sleep(1.67)
-            self.serPort.write(str(chooseWavelengthInAngstroms))
-            time.sleep(1.67)
-            out = self.serPort.read(self.serPort.in_waiting)
+            self.__wrt__('3')
+            #time.sleep(1.67)
+            self.__rd__()
+            self.__wrt__(str(chooseWavelengthInAngstroms))
+            #time.sleep(1.67)
+            out = self.__rd__()
             #print out
+            return out
 
     def stepUp(self):
-        self.serPort.write('4')
-        time.sleep(1)
+        self.__wrt__('4')
+        #time.sleep(1)
+        return self.__rd__()
 
     def stepDown(self):
-        self.serPort.write('5')
-        time.sleep(1)
+        self.__wrt__('5')
+        #time.sleep(1)
+        return self.__rd__()
 
     def getWavelength(self):
-        self.serPort.write('6')
-        time.sleep(1.67)
-        currentWavelength = self.serPort.read(self.serPort.in_waiting)
+        self.__wrt__('6')
+        #time.sleep(1.67)
+        currentWavelength = self.__rd__()
         self.currentWavelength = currentWavelength
-        print currentWavelength
+        return currentWavelength
 
     def closePort(self):
         self.serPort.close()
@@ -130,42 +126,13 @@ class Mono(object):
         print self.serPort.in_waiting
         print self.serPort.read(self.serPort.in_waiting)
 
-    def manualIncrementUp(self, low, high, inc):
-        low = low
-        high = high
-        self.low = low
-        self.high = high
-        self.inc = inc
-        difference = high - low
-        if difference % inc == 0:
-            while (low) <= high:
-                self.goToWavelength(low)
-                low = low + inc
-        else:
-            print "Cannot increment by that amount"
-
-    def manualIncrementDown(self, High, Low, Inc):
-        High = High
-        Low = Low
-        self.High = High
-        self.Low = Low
-        self.Inc = Inc
-        Difference = High - Low
-        if Difference % Inc == 0:
-            while (Low) <= High:
-                self.goToWavelength(High)
-                High = High - Inc
-                time.sleep(2)
-        else:
-            print "Cannot increment by that amount"
-
     def __del__(self):
         print "Final monochromator wavelength is"
-        self.getWavelength()
+        print self.getWavelength()
         print "Saved value is"
-        self.getWavelengthFromMemory()
-        finalWavelength = int(self.currentWavelength)
-        if int(self.storedWavelength) != finalWavelength:
+        print self.getWavelengthFromMemory()
+        finalWavelength = float(self.currentWavelength)
+        if float(self.storedWavelength) != finalWavelength:
             print "Updating saved value."
             self.setWavelengthInMemory(finalWavelength)
         self.closePort()
