@@ -12,30 +12,45 @@
 # edited by Darby Hewitt 5/31/2016
 # * adding return values to all methods in order to minimize timing errors
 # * also replacing fixed delays between serial writes to serial reads
+#
+# edited by Darby 6/2/16
+# * ripped Jared's wrt and rd functions from
+
 
 import serial
 import time
 
 class Mono(object):
     def __init__(self, port):
-        self.serPort = serial.Serial(port)
+        self.serPort = serial.Serial(port, baudrate=115200)
         #time.sleep(1.67)
         #numberOfCharacters = self.serPort.in_waiting
         #below is a better way to wait than just sleeping;
         #  also it clears the buffer. assignment to initialReadout
         #  automatically waits for readline to return something
-        initialReadout = self.serPort.readline()
-        initialReadout = self.serPort.readline()
-        initialReadout = self.serPort.readline()
+        #initialReadout = self.serPort.readline()
+        #initialReadout = self.serPort.readline()
+        #initialReadout = self.serPort.readline()
+        a.reset_input_buffer()
+        a.reset_output_buffer()
 
-        print "Monochromator wavelength is"
-        self.getWavelengthFromMemory()
+        #print "Monochromator wavelength is"
+        #self.getWavelengthFromMemory()
+
+    def __wrt__(self, input):
+        self.serPort.write(input)
+        while(not self.serPort.in_waiting):
+            pass
+        time.sleep(.01)
+
+    def __rd__(self):
+        return str(self.serPort.read(self.serPort.in_waiting)).strip()
 
     def setWavelengthInMemory(self, inputWavelength):
         self.inputWavelength = inputWavelength
         address = 0
 
-        self.serPort.write('1')
+        self.__wrt__('1')
         #time.sleep(1.67)
         while(self.serPort.in_waiting == 0):
             # this should do nothing until something is in the input buffer
@@ -51,7 +66,6 @@ class Mono(object):
         #flush input buffer
         self.serPort.reset_input_buffer()
 '''
-
         self.serPort.write(str(inputWavelength))
 
         while(self.serPort.in_waiting == 0):
