@@ -75,3 +75,4 @@ wrt(a, '3')
 rd(a)
 wrt(a, '6700')
 wave = rd(a)
+print "Reset to initial conditions"
