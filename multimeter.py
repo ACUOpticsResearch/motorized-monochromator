@@ -8,24 +8,42 @@
 
 import visa
 
-rm = visa.ResourceManager()
-lr = rm.list_resources()
-my_instrument = 0
+class Multimeter(object):
+	def __init__(self, visaID = ""):
+		self.rm = visa.ResourceManager()
+		lr = self.rm.list_resources()
 
+		if visaID == "":
+			for r in lr:
+				if r.find('USB') >= 0:
+					self.my_instrument = self.rm.open_resource(str(r))
+					self.my_instrument.timeout = 10000
+					temp_name = self.my_instrument.query('*IDN?')
+					if temp_name.find('33450A') >= 0:
+						print "Import of multimeter successful: " + str(r)
+						break
+		else:
+			self.my_instrument = self.rm.open_resource(visaID)
+			self.my_instrument.timeout = 10000
+			print "Import of multimeter successful: " + visaID
 
-def measureVoltage():
-	measurment = my_instrument.query('meas:volt:dc?')
-	return measurment
+	def measureVoltage(self):
+		return self.my_instrument.query('meas:volt:dc?')
 
-for r in lr:
-    if r.find('USB') >= 0:
-        my_instrument = rm.open_resource(str(r))
-        print "import of multimeter successful: "+str(r)
-        print measureVoltage()
-        break
-        
-	
+	def measureResistance(self):
+		return self.my_instrument.query('meas:res?')
 
-  
+	def measureCurrent(self):
+		return self.my_instrument.query('meas:curr?')
+
+	def __del__(self):
+		self.rm.close()
+
 if __name__=="__main__":
-    print measureVoltage()
+	print "A"
+	a = Multimeter()
+	print "B"
+	print a.my_instrument.query('*IDN?')
+	print "C"
+	print a.my_instrument.query('meas:volt:dc?')
+#	print a.measureVoltage()
