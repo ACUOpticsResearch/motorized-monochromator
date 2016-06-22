@@ -9,8 +9,8 @@
 import visa
 
 class Multimeter(object):
-	def __init__(self, visaID = ""):
-		self.rm = visa.ResourceManager()
+	def __init__(self, rm, visaID = ""):
+		self.rm = rm
 		lr = self.rm.list_resources()
 
 		if visaID == "":
@@ -19,31 +19,42 @@ class Multimeter(object):
 					self.my_instrument = self.rm.open_resource(str(r))
 					self.my_instrument.timeout = 10000
 					temp_name = self.my_instrument.query('*IDN?')
-					if temp_name.find('33450A') >= 0:
-						print "Import of multimeter successful: " + str(r)
+					if temp_name.find('34450A') >= 0:
 						break
+					else:
+						self.my_instrument.before_close()
+						self.my_instrument.close()
 		else:
 			self.my_instrument = self.rm.open_resource(visaID)
 			self.my_instrument.timeout = 10000
-			print "Import of multimeter successful: " + visaID
 
-	def measureVoltage(self):
-		return self.my_instrument.query('meas:volt:dc?')
+	def measureVoltageDC(self):
+		measure = self.my_instrument.query('meas:volt:dc?')
+		measure = measure.strip()
+		return float (measure)
+
+	def measureVoltageAC(self):
+		measure = self.my_instrument.query('meas:volt:ac?')
+		measure = measure.strip()
+		return float (measure)
 
 	def measureResistance(self):
-		return self.my_instrument.query('meas:res?')
+		measure = self.my_instrument.query('meas:res?')
+		measure = measure.strip()
+		return float (measure)
 
 	def measureCurrent(self):
-		return self.my_instrument.query('meas:curr?')
+		measure = self.my_instrument.query('meas:curr?')
+		measure = measure.strip()
+		return float (measure)
 
 	def __del__(self):
-		self.rm.close()
+		self.my_instrument.before_close()
+		#self.my_instrument.clear()
+		self.my_instrument.close()
 
 if __name__=="__main__":
-	print "A"
-	a = Multimeter()
-	print "B"
+	rm = visa.ResourceManager()
+	a = Multimeter(rm)
 	print a.my_instrument.query('*IDN?')
-	print "C"
-	print a.my_instrument.query('meas:volt:dc?')
-#	print a.measureVoltage()
+	print a.measureVoltageDC()
