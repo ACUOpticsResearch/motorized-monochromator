@@ -22,111 +22,102 @@ import time
 
 class Mono(object):
     def __init__(self, port):
+        #Opens up communication with the Arduino and empties the buffer
+        #so that it is ready to receive input.
         self.serPort = serial.Serial(port, baudrate=115200)
         time.sleep(2)
-        #numberOfCharacters = self.serPort.in_waiting
-        #below is a better way to wait than just sleeping;
-        #  also it clears the buffer. assignment to initialReadout
-        #  automatically waits for readline to return something
-        #initialReadout = self.serPort.readline()
-        #initialReadout = self.serPort.readline()
-        #initialReadout = self.serPort.readline()
         self.serPort.reset_input_buffer()
         self.serPort.reset_output_buffer()
-        #print "Monochromator wavelength is"
+
+        #Ensures that the local wavelength variable and the wavelength
+        #variable stored in memory are synced on startup.
         self.getWavelengthFromMemory()
 
     def __wrt__(self, input):
+        #Sends the imput command over serial to the Arduino. Then, it waits
+        #the Arduino sends a response back to say that it has received the
+        #command.
         self.serPort.write(input)
         while(not self.serPort.in_waiting):
             pass
         time.sleep(.01)
 
     def __rd__(self):
+        #Reads everything waiting in the buffer, then strips it of
+        #unnecessary white space, casts it as a string, and then returns it.
         return str(self.serPort.read(self.serPort.in_waiting)).strip()
 
+        #After __wrt__() is called, this function should be called before
+        #calling __wrt__() again. This allows Python and the Arduino to
+        #properly wait for eachother to finish.
+
     def setWavelengthInMemory(self, inputWavelength):
+        #Sends the command that corresponds to this method to the Arduino,
+        #specifies the wavelength, and then returns the same wavelength.
         self.__wrt__(str(1))
-        #time.sleep(1.67)
-        #while(self.serPort.in_waiting == 0):
-            # this should do nothing until something is in the input buffer
-        #    pass
-        #flush input buffer
         self.serPort.reset_input_buffer()
-
-        #self.serPort.write(str(address))
-        #while(self.serPort.in_waiting == 0):
-            # this should do nothing until something is in the input buffer
-        #    pass
-        #flush input buffer
-        #self.serPort.reset_input_buffer()
-
         self.__wrt__(str(inputWavelength))
-
-        #while(self.serPort.in_waiting == 0):
-            # this should do nothing until something is in the input buffer
-        #    pass
-
-        #output contents of input buffer
-        wvl = self.__rd__()
-        #reset input buffer after read
+        wvl = self.__rd__()                     #This read is necessary because the Arduino sends a response back to Python once it is done
         self.serPort.reset_input_buffer()
-        #print wvl
         return wvl
 
     def getWavelengthFromMemory(self):
+        #Sends the command that corresponds to this method to the Arduino,
+        #and then reads the Serial buffer, and returns the wavelength that
+        #is stored in memory
         self.__wrt__('2')
-#        time.sleep(1.67)
-#        storedWavelength = self.serPort.read(self.serPort.in_waiting)
-
-        #wait for available bytes
-        #while(self.serPort.in_waiting == 0)
-        #    pass
-
         self.storedWavelength = self.__rd__()
         return self.storedWavelength
 
     def goToWavelength(self, chooseWavelengthInAngstroms):
+        #First checks if the given wavelength is within the possible range
         self.chooseWavelengthInAngstroms = chooseWavelengthInAngstroms
         if chooseWavelengthInAngstroms > 9950 or chooseWavelengthInAngstroms < 2500:
-            raise ValueError('Invalid monochromator wavelength')
+            raise ValueError('Invalid monochromator wavelength')  #raises an error if it is out of range
         else:
+            #Sends the command to the Arduino, reads its affirmative response,
+            #then sends the wavelength, reads its response again, and then
+            #returns it.
             self.__wrt__('3')
-            #time.sleep(1.67)
             self.__rd__()
             self.__wrt__(str(chooseWavelengthInAngstroms))
-            #time.sleep(1.67)
             out = self.__rd__()
-            #print out
             return out
 
     def stepUp(self):
+        #Sends the corresponding command and then returns it.
         self.__wrt__('4')
-        #time.sleep(1)
         return self.__rd__()
 
     def stepDown(self):
+        #Same as stepUp(), except for it sends the command corresponding to
+        #the stepDown function in the Arduino.
         self.__wrt__('5')
-        #time.sleep(1)
         return self.__rd__()
 
     def getWavelength(self):
+        #Sends the request to the Arduino, reads its response, updates the
+        #current variable on the Python side, and then returns it.
         self.__wrt__('6')
-        #time.sleep(1.67)
         currentWavelength = self.__rd__()
         self.currentWavelength = currentWavelength
         return currentWavelength
 
     def closePort(self):
+        #Tells the Serial port to close
         self.serPort.close()
 
     def openPort(self, Port):
+        #Opens the Serial port for communication
         self.serPort = serial.Serial(Port)
         time.sleep(1.67)
         print self.serPort.in_waiting
         print self.serPort.read(self.serPort.in_waiting)
 
     def __del__(self):
+        #Checks to see if the local and memory variables are synced. If not,
+        #calls getWavelengthFromMemory() in order to sync them. Then, it
+        #closes the port.
         print "Final monochromator wavelength is"
         print self.getWavelength()
         print "Saved value is"
@@ -138,9 +129,9 @@ class Mono(object):
         self.closePort()
 
     def shutDown(self):
+        #Simply calls the destructor
         self.__del__()
 
 
 if __name__ == "__main__":
     b = Mono('COM3')
-    #b.setWavelengthInMemory(6990)
