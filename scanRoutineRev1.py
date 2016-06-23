@@ -1,5 +1,6 @@
 # Written by Candace Brooks and Darby Hewitt 2015.
 #condensed by Darby Hewitt on 8/16/2015
+#Modified by Jared Barker 2016
 
 #TO DO:
 # un-class-ify this (DONE?)
@@ -7,59 +8,52 @@
 # implement real-time plotting
 # put everything in a try:/except: so data taking can be exited gracefully (DONE?)
 # export csv file instead of posting data struct to screen (updated, needs testing)
-# Jared waz here
 
 from monochromator import Mono
 from multimeter import Multimeter
-import matplotlib #only needed if realTimeOut flag is set to true
-import serial #necessary?
-import time #necessary?
 import visa
 
 #startWvl and endWvl must have values between 2500 and 9950
 def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName):
+    #Creates necessary objects. Also creates an empty array to store the measurements
     a = Mono(port)
     b = Multimeter(visa.ResourceManager())
-    #time.sleep(4)
     data = {}
 
-#step backwards if necessary
+    #If it needs to go backwards, it adjusts the step size
     if startWvl > endWvl:
         stepSize = -stepSize
 
-    my_file = open(fileName, "w")
-    a.goToWavelength(startWvl) #should I go here before the loop?
-    print range(startWvl, endWvl, stepSize)
-    try:
-        #start at start wavelength, and increment by stepSize taking numPtsPerWvl data points at each wvl
+    my_file = open(fileName, "w")   #creates a file to write the measurements into
+    a.goToWavelength(startWvl)      #moves to the starting wavelength
+    try:    #put into a try statement in case of error
+        #start at start wavelength, and increment by stepSize taking numPtsPerWvl data points at each wavelength
         for wvl in range(startWvl, endWvl, stepSize):
             a.goToWavelength(wvl)
             buf = [] #buffer for storing numPtsPerWvl data points
             for i in range(numPtsPerWvl):
-                value = b.measureVoltageDC()
-                buf.append(value)
-                my_file.write(str(wvl) + "," + str(value) + "\n")
+                value = b.measureVoltageDC()                        #measures the Voltage
+                buf.append(value)                                   #adds the measurement to the array
+                my_file.write(str(wvl) + "," + str(value) + "\n")   #adds the wavelength and measurement to the file
+            data[wvl] = buf                                         #adds the small array to the larger array
 
-            data[wvl] = buf
-
-        #include endWvl values, too
+        #Since the upper limit of ranger() is not inclusive, we must additiionally measure the voltage at the designated upper limit.
         a.goToWavelength(endWvl)
-        buf = [] #buffer for storing numPtsPerWvl data points
+        buf = []
         for i in range(numPtsPerWvl):
             value = b.measureVoltageDC()
             buf.append(value)
             my_file.write(str(endWvl) + "," + str(value) + "\n")
         data[endWvl] = buf
-    except:
+    except:     #runs if an error occured during the try statement
         print "There was a scan routine error! Check the data file for clues!"
 
     finally:
-        # FILE STUFF BELOW.
+        #closes the file
         my_file.close()
-        #a.shutDown() #close and destroy link to com port; shouldn't need to call this
 
     return data
 
 if __name__=="__main__":
+    #scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName):
     scanRoutine('COM3', 6990, 7010, 2, 5, 'testWithVis.csv')
-    #scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, realTimeOut=false):
