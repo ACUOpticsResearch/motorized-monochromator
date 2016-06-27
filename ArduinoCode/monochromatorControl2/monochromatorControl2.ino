@@ -79,20 +79,25 @@ float goToWavelength(float wave){
     wave = currentLocal;
   }
 
+  int steps;
+
   //Calculates the number of steps the motor will need to turn in order to get to the desired wavelength
   int dif = wave - currentLocal;
   if(dif<0){
     dif = dif*(-1);
+    steps = dif/.31145;
   }
-  int steps = dif/.3125; // 1/4   
+  else{
+    steps = dif/.31215;
+  }
  
   //Turns the motor in the needed direction for the calculated number of steps
   if( wave > currentLocal ){
-    myMotor->step(steps, FORWARD, SINGLE);
+    myMotor->step(steps, FORWARD, DOUBLE);
     myMotor->release();
   }
   if( wave < currentLocal ){
-    myMotor->step(steps, BACKWARD, SINGLE);
+    myMotor->step(steps, BACKWARD, DOUBLE);
     myMotor->release();
   }
   
@@ -103,7 +108,7 @@ float goToWavelength(float wave){
 
 float stepUp(){
   //Moves motor one step up and returns the new wavelength
-  myMotor->step(1, FORWARD, SINGLE);
+  myMotor->step(1, FORWARD, DOUBLE);
   currentLocal = currentLocal + .3125;
   myMotor->release();
   return currentLocal;  
@@ -111,7 +116,7 @@ float stepUp(){
 
 float stepDown(){
   //Moves motor one step down and returns the new wavelength
-  myMotor->step(1, BACKWARD, SINGLE);
+  myMotor->step(1, BACKWARD, DOUBLE);
   currentLocal = currentLocal - .3125;
   myMotor->release();
   return currentLocal;
