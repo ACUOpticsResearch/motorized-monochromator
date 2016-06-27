@@ -45,8 +45,9 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName):
             buf.append(value)
             my_file.write(str(endWvl) + "," + str(value) + "\n")
         data[endWvl] = buf
-    except:     #runs if an error occured during the try statement
+    except Expection as e:     #runs if an error occured during the try statement
         print "There was a scan routine error! Check the data file for clues!"
+        print e
 
     finally:
         #closes the file
