@@ -85,11 +85,8 @@ float goToWavelength(float wave){
   int dif = wave - currentLocal;
   if(dif<0){
     dif = dif*(-1);
-    steps = dif/.31145;
   }
-  else{
-    steps = dif/.31215;
-  }
+  steps = dif/.31215;
  
   //Turns the motor in the needed direction for the calculated number of steps
   if( wave > currentLocal ){
