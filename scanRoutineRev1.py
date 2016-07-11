@@ -14,11 +14,12 @@ from multimeter import Multimeter
 import visa
 
 #startWvl and endWvl must have values between 2500 and 9950
-def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName):
+def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, average = False):
     #Creates necessary objects. Also creates an empty array to store the measurements
     a = Mono(port)
     b = Multimeter(visa.ResourceManager())
     data = {}
+    avg = {}
 
     #If it needs to go backwards, it adjusts the step size
     if startWvl > endWvl:
@@ -36,6 +37,8 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName):
                 buf.append(value)                                   #adds the measurement to the array
                 my_file.write(str(wvl) + "," + str(value) + "\n")   #adds the wavelength and measurement to the file
             data[wvl] = buf                                         #adds the small array to the larger array
+            if average:
+                avg[wvl] = sum(buf)
 
         #Since the upper limit of ranger() is not inclusive, we must additiionally measure the voltage at the designated upper limit.
         a.goToWavelength(endWvl)
@@ -45,6 +48,14 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName):
             buf.append(value)
             my_file.write(str(endWvl) + "," + str(value) + "\n")
         data[endWvl] = buf
+        if average:
+            avg[endWvl] = sum(buf)
+
+        if average:
+            my_file.write("\n\n")
+            for wvl in avg:
+                my_file.write(str(wvl) + "," + str(avg[wvl]) + "\n")
+
     except Expection as e:     #runs if an error occured during the try statement
         print "There was a scan routine error! Check the data file for clues!"
         print e
