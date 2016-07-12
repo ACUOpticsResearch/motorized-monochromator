@@ -103,6 +103,10 @@ class Mono(object):
         self.currentWavelength = currentWavelength
         return currentWavelength
 
+    def release(self):
+        self.__wrt__('7')
+        return self.__rd()
+
     def closePort(self):
         #Tells the Serial port to close
         self.serPort.close()
@@ -126,6 +130,7 @@ class Mono(object):
         if float(self.storedWavelength) != finalWavelength:
             print "Updating saved value."
             self.setWavelengthInMemory(finalWavelength)
+        print release()
         self.closePort()
 
     def shutDown(self):
