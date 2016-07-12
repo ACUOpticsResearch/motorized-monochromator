@@ -91,11 +91,9 @@ float goToWavelength(float wave){
   //Turns the motor in the needed direction for the calculated number of steps
   if( wave > currentLocal ){
     myMotor->step(steps, FORWARD, DOUBLE);
-    myMotor->release();
   }
   if( wave < currentLocal ){
     myMotor->step(steps, BACKWARD, DOUBLE);
-    myMotor->release();
   }
   
   //Keeps the variable up to date and then returns it
@@ -107,7 +105,6 @@ float stepUp(){
   //Moves motor one step up and returns the new wavelength
   myMotor->step(1, FORWARD, DOUBLE);
   currentLocal = currentLocal + .3125;
-  myMotor->release();
   return currentLocal;  
 }
 
@@ -115,7 +112,6 @@ float stepDown(){
   //Moves motor one step down and returns the new wavelength
   myMotor->step(1, BACKWARD, DOUBLE);
   currentLocal = currentLocal - .3125;
-  myMotor->release();
   return currentLocal;
 }
 
@@ -175,6 +171,12 @@ void loop() {
   //Prints the Local Wavelength
   if(action == 6){
     Serial.println(currentLocal);
+  }
+  
+  //Releases the motor
+  if(action == 7){
+    myMotor->release();
+    Serial.println("Released");
   }
 }
 
