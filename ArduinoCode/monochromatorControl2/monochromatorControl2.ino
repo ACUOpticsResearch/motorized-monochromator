@@ -25,6 +25,7 @@ Adafruit_StepperMotor *myMotor = AFMS.getStepper(200, 2);
 #define ADDR 0
 float currentMemory;
 float currentLocal;
+boolean isForward;
 
 float EEPROMReadFloat()
 {
@@ -56,6 +57,16 @@ float EEPROMWriteFloat(float value)
   return value;
 }
 
+void checkSlack(boolean willMoveForward)
+{
+  if(isForward && !willMoveForward){
+    myMotor->step(1, BACKWARD, DOUBLE);
+  }
+  if(!isForward && willMoveForward){
+    myMotor->step(1, FORWARD, DOUBLE);
+  } 
+}
+
 float setWavelengthToMemory(float wave) {
   //Updates the two global variables, writes it into EEPROM, and returns the given wavelength
   currentLocal = wave;
@@ -80,20 +91,23 @@ float goToWavelength(float wave){
   }
 
   int steps;
-
   //Calculates the number of steps the motor will need to turn in order to get to the desired wavelength
   int dif = wave - currentLocal;
   if(dif<0){
     dif = dif*(-1);
   }
-  steps = dif/.31215;
+  steps = dif/.3125;
  
   //Turns the motor in the needed direction for the calculated number of steps
   if( wave > currentLocal ){
+    checkSlack(true);
     myMotor->step(steps, FORWARD, DOUBLE);
+    isForward = true;
   }
   if( wave < currentLocal ){
+    checkSlack(false);
     myMotor->step(steps, BACKWARD, DOUBLE);
+    isForward = false;
   }
   
   //Keeps the variable up to date and then returns it
@@ -103,14 +117,18 @@ float goToWavelength(float wave){
 
 float stepUp(){
   //Moves motor one step up and returns the new wavelength
+  checkSlack(true);
   myMotor->step(1, FORWARD, DOUBLE);
+  isForward = true;
   currentLocal = currentLocal + .3125;
   return currentLocal;  
 }
 
 float stepDown(){
   //Moves motor one step down and returns the new wavelength
+  checkSlack(false);
   myMotor->step(1, BACKWARD, DOUBLE);
+  isForward = false;
   currentLocal = currentLocal - .3125;
   return currentLocal;
 }
