@@ -56,7 +56,7 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, averag
             for wvl in avg:
                 my_file.write(str(wvl) + "," + str(avg[wvl]) + "\n")
 
-    except Expection as e:     #runs if an error occured during the try statement
+    except Exception as e:     #runs if an error occured during the try statement
         print "There was a scan routine error! Check the data file for clues!"
         print e
 
