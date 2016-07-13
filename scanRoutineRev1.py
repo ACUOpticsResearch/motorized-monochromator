@@ -12,6 +12,8 @@
 from monochromator import Mono
 from multimeter import Multimeter
 import visa
+import operator
+
 
 #startWvl and endWvl must have values between 2500 and 9950
 def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, average = False):
@@ -53,8 +55,9 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, averag
 
         if average:
             my_file.write("\n\n")
-            for wvl in avg:
-                my_file.write(str(wvl) + "," + str(avg[wvl]) + "\n")
+            sorted_avg = sorted(avg.items(), key=operator.itemgetter(0))
+            for wvl in sorted_avg:
+                my_file.write(str(wvl[0]) + "," + str(wvl[1]) + "\n")
 
     except Expection as e:     #runs if an error occured during the try statement
         print "There was a scan routine error! Check the data file for clues!"
