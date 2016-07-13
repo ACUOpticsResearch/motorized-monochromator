@@ -1,6 +1,6 @@
 # Written by Jared Barker
 
-import serial
+'''import serial
 import time
 
 def wrt(a, input):
@@ -76,3 +76,11 @@ rd(a)
 wrt(a, '6700')
 wave = rd(a)
 print "Reset to initial conditions"
+'''
+
+from monochromator import Mono
+a=Mono('COM3')
+
+for x in xrange(1, 10):
+    a.goToWavelength(7000)
+    a.goToWavelength(6000)
