@@ -82,7 +82,7 @@ class Mono(object):
         roundedWavelength = self._roundToStepSize(chooseWavelengthInAngstroms)
         if roundedWavelength != chooseWavelengthInAngstroms:
             chooseWavelengthInAngstroms = roundedWavelength
-            print "Rounded to "  + roundedWavelength
+            print "Rounded to "  + str(roundedWavelength)
 
         if chooseWavelengthInAngstroms > 9950 or chooseWavelengthInAngstroms < 2500:
             raise ValueError('Invalid monochromator wavelength')  #raises an error if it is out of range
