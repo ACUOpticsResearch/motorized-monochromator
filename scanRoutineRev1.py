@@ -32,7 +32,7 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, averag
     try:    #put into a try statement in case of error
         #start at start wavelength, and increment by stepSize taking numPtsPerWvl data points at each wavelength
         for wvl in range(startWvl, endWvl, stepSize):
-            a.goToWavelength(wvl)
+            print a.goToWavelength(wvl)
             buf = [] #buffer for storing numPtsPerWvl data points
             for i in range(numPtsPerWvl):
                 value = b.measureVoltageDC()                        #measures the Voltage
@@ -43,7 +43,7 @@ def scanRoutine(port, startWvl, endWvl, numPtsPerWvl, stepSize, fileName, averag
                 avg[wvl] = sum(buf)
 
         #Since the upper limit of ranger() is not inclusive, we must additiionally measure the voltage at the designated upper limit.
-        a.goToWavelength(endWvl)
+        print a.goToWavelength(endWvl)
         buf = []
         for i in range(numPtsPerWvl):
             value = b.measureVoltageDC()
