@@ -112,7 +112,7 @@ float goToWavelength(float wave){
   
   //Keeps the variable up to date and then returns it
   currentLocal = wave;
-  return currentLocal;
+  return steps;
 }   
 
 float stepUp(){
