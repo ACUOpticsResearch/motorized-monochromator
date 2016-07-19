@@ -3,8 +3,15 @@
 
 
 import csv
-with open('file.csv', 'rb') as f:
+with open('NISTAdjustedData.csv', 'rb') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
-print your_list
+my_file = open('NISTDataWithSpikes.csv', "w")
+
+for spike in your_list:
+    my_file.write(str(float(spike[0]) - 3) + ",0\n")
+    my_file.write(spike[0] + "," + spike[1] + "\n")
+    my_file.write(str(float(spike[0]) + 3) + ",0\n")
+
+my_file.close()
