@@ -92,7 +92,7 @@ float goToWavelength(float wave){
 
   int steps;
   //Calculates the number of steps the motor will need to turn in order to get to the desired wavelength
-  int dif = wave - currentLocal;
+  float dif = wave - currentLocal;
   if(dif<0){
     dif = dif*(-1);
   }
