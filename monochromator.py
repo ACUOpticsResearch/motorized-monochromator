@@ -152,4 +152,3 @@ class Mono(object):
 
 if __name__ == "__main__":
     b = Mono('COM3')
-    b.setWavelengthInMemory(6000)
