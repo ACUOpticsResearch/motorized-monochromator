@@ -2,7 +2,7 @@
 #By Jared Barker
 
 import csv
-with open('LaserNoSlit.csv', 'rb') as f:
+with open('VerticalMount.csv', 'rb') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
