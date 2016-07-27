@@ -2,11 +2,11 @@
 #By Jared Barker
 
 import csv
-with open('VerticalMount.csv', 'rb') as f:
+with open('LISO.csv', 'rb') as f:
     reader = csv.reader(f)
     your_list = list(reader)
 
-my_file = open('LaserNoSlitAverage.csv', "w")
+my_file = open('LISOAverage.csv', "w")
 currentWavelength = 5000
 average = 0
 
