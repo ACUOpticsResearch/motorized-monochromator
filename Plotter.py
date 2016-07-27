@@ -9,12 +9,12 @@ measuredIntensity = []
 NISTWavelength = []
 NISTIntensity = []
 
-with open('AdjustedNeonDataNanometers.csv','r') as csvfile:
+with open('LISOAverage.csv','r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        measuredWavelength.append(float(row[0]))
-        measuredIntensity.append((float(row[1])-.53)/(0.307346394))
-
+        measuredWavelength.append(float(row[0])/10)
+        measuredIntensity.append(float(row[1]))
+'''
 with open('AdjustedNeonNISTDataNanometers.csv','r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
@@ -62,5 +62,13 @@ plt.axis([580,700,0,1.1])
 plt.annotate('Known Lines', xy=(640,1), xytext=(587, .9), fontsize='x-large', backgroundcolor='white')
 plt.annotate('(NIST Atomic Spectra Database)', xy=(640,1), xytext=(587, .8), fontsize='small', backgroundcolor='white')
 plt.yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0], ['0', '0.2', '0.4', '0.6', '0.8', '1.0'])
+'''
+plt.plot(measuredWavelength,measuredIntensity, label='LISO')
+plt.ylabel('Relative Intensity', fontsize='large')
+plt.xlabel('Wavelength (nm)', fontsize='large')
+plt.axis([395, 500,.19, .32])
+plt.annotate('LYSO (Ce)', xy=(410,.24), xytext=(410,.30), fontsize='x-large')
+plt.annotate('Laser Scatter', xy=(399,.27), xytext=(420, .26), fontsize='large', arrowprops=dict(facecolor='black', shrink=.05, width=1, headwidth=10))
+plt.annotate('Laser Scatter', xy=(395,.31), xytext=(420, .26), fontsize='large', arrowprops=dict(facecolor='black', shrink=.05, width=1, headwidth=10))
 
 plt.show()
